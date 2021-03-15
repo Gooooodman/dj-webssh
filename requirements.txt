@@ -1,0 +1,7 @@
+channels==2.3.1
+channels_redis==2.4.1
+Django==3.0.7
+APScheduler==3.7.0
+paramiko==2.7.2
+django-redis==4.12.1
+mysqlclient==2.0.1

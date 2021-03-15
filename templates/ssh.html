@@ -1,0 +1,66 @@
+<html>
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+   <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+</head>
+<body>
+<input type="button" value="执行命令" onclick="show()">
+  <div id="terminal"></div>
+  <script type="text/javascript">
+      var window_width = $(window).width();
+      var window_height = $(window).height();
+      var term = new Terminal(
+            {
+                cols: Math.floor(window_width/9),
+                rows: Math.floor(window_height/20),
+                useStyle:false,
+                cursorBlink:false
+            }
+    );
+    term.open(document.getElementById('terminal'));
+
+  </script>
+
+
+    <script type="text/javascript">
+        $(function () {
+           var s = new WebSocket("ws://10.2.30.37:9001/ws/ssh/123a/1/");
+           s.binaryType = "arraybuffer";
+            s.onopen = function(){
+                s.send(JSON.stringify({"resize":[210,52]}))
+                s.send(JSON.stringify({"data":"w"}))
+                s.send(JSON.stringify({"data":"\r"}))
+            }
+
+            s.onmessage = function (e) {
+                data = e.data;
+                var bufView = new Uint8Array(data)
+                console.log(bufView)
+                console.log(data);
+		        var unis = [];
+		        for (var i = 0; i < bufView.length; i++) {
+		          unis.push(bufView[i]);
+		        }
+		        term.writeln(String.fromCharCode.apply(null, unis))
+                {#term.writeln(data)#}
+                 {#term.writeln(' 17:03:41 up 49 days,  1:37, 10 users,  load average: 0.18, 0.30, 0.31\r\nUSER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT\r\nroot     tty1                      25Jan21 49days  0.06s  0.06s -bash\r\nroot     pts/0    10.2.111.223     Sat09    1:32m  4:33   0.37s -bash\r\nroot     pts/1    10.2.111.223     Sat10    2:29m 31.26s 31.11s python manage.py runworker ssh_exec\r\nroot     pts/2    10.2.111.223     Sat14    7:02m  0.10s  0.10s -bash\r\nroot     pts/3    10.2.111.223     Sun14    1:24m  0.31s  0.31s -bash\r\nroot     pts/4    localhost        17:03    1.00s  0.03s  0.00s w\r\nroot     pts/5    10.2.111.223     10:01    6:32m  7:17   7:15  /root/webssh/bin/python manage.py runserver 0.0.0.0:9001\r\nroot     pts/6    10.2.111.223     10:18    6:44m  1:29   1:29  python manage.py runworker ssh_exec\r\nroot     pts/7    localhost        15:31    1:32m  0.03s  0.03s -bash\r\nroot     pts/8    localhost        15:31    1:31m  0.03s  0.03s -bash\r\n');#}
+            };
+            {#// 把s挂到全局#}
+            {#window.s = s;#}
+
+
+         s.onclose = function (event) {
+          alter("close")
+          conn.close();
+        };
+
+        s.onerror = function(event) {
+          alter("连接websock超时,请检查网络！查询日志查看任务是否完成！")
+        };
+
+
+        });
+    </script>
+</body>
+</html>

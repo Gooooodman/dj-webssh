@@ -10,30 +10,30 @@ from threading import Thread
 import json
 import time
 
-
-class ExecConsumer(WebsocketConsumer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.token = self.scope['url_route']['kwargs']['token']
-        self.rds = get_redis_connection()
-
-    def connect(self):
-        self.accept()
-
-    def disconnect(self, code):
-        self.rds.close()
-
-    def get_response(self):
-        response = self.rds.brpop(self.token, timeout=5)
-        return response[1] if response else None
-
-    def receive(self, **kwargs):
-        response = self.get_response()
-        while response:
-            data = response.decode()
-            self.send(text_data=data)
-            response = self.get_response()
-        self.send(text_data='pong')
+#
+# class ExecConsumer(WebsocketConsumer):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.token = self.scope['url_route']['kwargs']['token']
+#         self.rds = get_redis_connection()
+#
+#     def connect(self):
+#         self.accept()
+#
+#     def disconnect(self, code):
+#         self.rds.close()
+#
+#     def get_response(self):
+#         response = self.rds.brpop(self.token, timeout=5)
+#         return response[1] if response else None
+#
+#     def receive(self, **kwargs):
+#         response = self.get_response()
+#         while response:
+#             data = response.decode()
+#             self.send(text_data=data)
+#             response = self.get_response()
+#         self.send(text_data='pong')
 
 
 
@@ -87,7 +87,7 @@ class SSHConsumer(WebsocketConsumer):
     def _init(self):
         self.send(bytes_data=b'Connecting ...\r\n')
         host = Host.objects.filter(pk=self.id).first()
-        print(host.hostname)
+        # print(host.hostname)
         if not host:
             self.send(text_data='Unknown host\r\n')
             self.close()
@@ -96,7 +96,7 @@ class SSHConsumer(WebsocketConsumer):
         except Exception as e:
             self.send(bytes_data=f'Exception: {e}\r\n'.encode())
             self.close()
-        print(self.ssh)
+        # print(self.ssh)
         self.chan = self.ssh.invoke_shell(term='xterm')
         self.chan.transport.set_keepalive(30)
         Thread(target=self.loop_read).start()

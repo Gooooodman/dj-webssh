@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http.response import HttpResponse
-from libs.channel import Channel
+# from libs.channel import Channel
 from apps.host.models import Host
 import json
 

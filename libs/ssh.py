@@ -34,13 +34,13 @@ class SSH:
         key.write_private_key(key_obj)
         return key_obj.getvalue(), 'ssh-rsa ' + key.get_base64()
 
-    def add_public_key(self, public_key):
-        command = f'mkdir -p -m 700 ~/.ssh && \
-        echo {public_key!r} >> ~/.ssh/authorized_keys && \
-        chmod 600 ~/.ssh/authorized_keys'
-        code, out = self.exec_command(command)
-        if code != 0:
-            raise Exception(out)
+    # def add_public_key(self, public_key):
+    #     command = f'mkdir -p -m 700 ~/.ssh && \
+    #     echo {public_key!r} >> ~/.ssh/authorized_keys && \
+    #     chmod 600 ~/.ssh/authorized_keys'
+    #     code, out = self.exec_command(command)
+    #     if code != 0:
+    #         raise Exception(out)
 
     def ping(self):
         with self:
@@ -54,56 +54,56 @@ class SSH:
         self.client.connect(**self.arguments)
         return self.client
 
-    def put_file(self, local_path, remote_path):
-        with self as cli:
-            sftp = cli.open_sftp()
-            sftp.put(local_path, remote_path)
-            sftp.close()
-
-    def exec_command(self, command, timeout=1800, environment=None):
-        command = 'set -e\n' + command
-        with self as cli:
-            chan = cli.get_transport().open_session()
-            chan.settimeout(timeout)
-            chan.set_combine_stderr(True)
-            if environment:
-                str_env = ' '.join(f"{k}='{v}'" for k, v in environment.items())
-                command = f'export {str_env} && {command}'
-            chan.exec_command(command)
-            out = chan.makefile("r", -1)
-            return chan.recv_exit_status(), out.read()
-
-    def exec_command_with_stream(self, command, timeout=1800, environment=None):
-        command = 'set -e\n' + command
-        with self as cli:
-            chan = cli.get_transport().open_session()
-            chan.settimeout(timeout)
-            chan.set_combine_stderr(True)
-            if environment:
-                str_env = ' '.join(f"{k}='{v}'" for k, v in environment.items())
-                command = f'export {str_env} && {command}'
-            chan.exec_command(command)
-            stdout = chan.makefile("r", -1)
-            out = stdout.readline()
-            while out:
-                yield chan.exit_status, out
-                out = stdout.readline()
-            yield chan.recv_exit_status(), out
-
-    def put_file_by_fl(self, fl, remote_path, callback=None):
-        with self as cli:
-            sftp = cli.open_sftp()
-            sftp.putfo(fl, remote_path, callback=callback)
-
-    def list_dir_attr(self, path):
-        with self as cli:
-            sftp = cli.open_sftp()
-            return sftp.listdir_attr(path)
-
-    def remove_file(self, path):
-        with self as cli:
-            sftp = cli.open_sftp()
-            sftp.remove(path)
+    # def put_file(self, local_path, remote_path):
+    #     with self as cli:
+    #         sftp = cli.open_sftp()
+    #         sftp.put(local_path, remote_path)
+    #         sftp.close()
+    #
+    # def exec_command(self, command, timeout=1800, environment=None):
+    #     command = 'set -e\n' + command
+    #     with self as cli:
+    #         chan = cli.get_transport().open_session()
+    #         chan.settimeout(timeout)
+    #         chan.set_combine_stderr(True)
+    #         if environment:
+    #             str_env = ' '.join(f"{k}='{v}'" for k, v in environment.items())
+    #             command = f'export {str_env} && {command}'
+    #         chan.exec_command(command)
+    #         out = chan.makefile("r", -1)
+    #         return chan.recv_exit_status(), out.read()
+    #
+    # def exec_command_with_stream(self, command, timeout=1800, environment=None):
+    #     command = 'set -e\n' + command
+    #     with self as cli:
+    #         chan = cli.get_transport().open_session()
+    #         chan.settimeout(timeout)
+    #         chan.set_combine_stderr(True)
+    #         if environment:
+    #             str_env = ' '.join(f"{k}='{v}'" for k, v in environment.items())
+    #             command = f'export {str_env} && {command}'
+    #         chan.exec_command(command)
+    #         stdout = chan.makefile("r", -1)
+    #         out = stdout.readline()
+    #         while out:
+    #             yield chan.exit_status, out
+    #             out = stdout.readline()
+    #         yield chan.recv_exit_status(), out
+    #
+    # def put_file_by_fl(self, fl, remote_path, callback=None):
+    #     with self as cli:
+    #         sftp = cli.open_sftp()
+    #         sftp.putfo(fl, remote_path, callback=callback)
+    #
+    # def list_dir_attr(self, path):
+    #     with self as cli:
+    #         sftp = cli.open_sftp()
+    #         return sftp.listdir_attr(path)
+    #
+    # def remove_file(self, path):
+    #     with self as cli:
+    #         sftp = cli.open_sftp()
+    #         sftp.remove(path)
 
     def __enter__(self):
         if self.client is not None:

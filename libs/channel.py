@@ -16,19 +16,19 @@ import uuid
 layer = get_channel_layer()
 
 
-class Channel:
-    @staticmethod
-    def get_token():
-        # return uuid.uuid4().hex
-        return  "123a"
-    @staticmethod
-    def send_ssh_executor(hostname, port, username, command, token=None):
-        message = {
-            'type': 'exec',
-            'token': token,
-            'hostname': hostname,
-            'port': port,
-            'username': username,
-            'command': command
-        }
-        async_to_sync(layer.send)('ssh_exec', message)
+# class Channel:
+#     @staticmethod
+#     def get_token():
+#         # return uuid.uuid4().hex
+#         return  "123a"
+    # @staticmethod
+    # def send_ssh_executor(hostname, port, username, command, token=None):
+    #     message = {
+    #         'type': 'exec',
+    #         'token': token,
+    #         'hostname': hostname,
+    #         'port': port,
+    #         'username': username,
+    #         'command': command
+    #     }
+    #     async_to_sync(layer.send)('ssh_exec', message)

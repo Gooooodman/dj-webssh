@@ -5,7 +5,6 @@
    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
 </head>
 <body>
-<input type="button" value="执行命令" onclick="show()">
   <div id="terminal"></div>
   <script type="text/javascript">
       var window_width = $(window).width();
@@ -58,7 +57,6 @@
         s.onerror = function(event) {
           alter("连接websock超时,请检查网络！查询日志查看任务是否完成！")
         };
-
 
         });
     </script>
